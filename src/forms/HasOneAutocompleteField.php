@@ -64,6 +64,8 @@ class HasOneAutocompleteField extends FormField
 
     protected $clearButtonEnabled = false;
 
+    protected $sourceObject;
+
     /**
      * Variable that sets the autocomplete delay
      *
@@ -77,7 +79,7 @@ class HasOneAutocompleteField extends FormField
      * @param string $sourceObject Class name of the DataObject subclass
      * @param string $labelField The object field used for display
      */
-    public function __construct($name, $title, $sourceObject, $labelField = 'Title')
+    public function __construct($name, $title = null, $sourceObject, $labelField = 'Title')
     {
         $this->sourceObject = $sourceObject;
         $this->labelField = $labelField;
@@ -118,7 +120,7 @@ class HasOneAutocompleteField extends FormField
             $json = $this->processResults($results);
         }
 
-        return Convert::array2json($json);
+        return json_encode($json);
     }
 
     public function getSearchCallback()
@@ -139,7 +141,7 @@ class HasOneAutocompleteField extends FormField
      */
     protected function getResults($query)
     {
-        $searchFields = ($this->getSearchFields() ?: singleton($this->sourceObject)->stat('searchable_fields'));
+        $searchFields = ($this->getSearchFields() ?: singleton($this->sourceObject)->config()->get('searchable_fields'));
 
         if (!$searchFields) {
             throw new Exception(
