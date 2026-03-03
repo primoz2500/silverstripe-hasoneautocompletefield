@@ -2,17 +2,17 @@
 
 namespace primoz2500\HasOneAutocompleteField\Forms;
 
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Convert;
-use SilverStripe\Forms\FieldGroup;
-use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\HiddenField;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataList;
 use SilverStripe\View\Requirements;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataList;
+use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Core\Config\Config;
 
 class HasOneAutocompleteField extends FormField
 {
@@ -153,9 +153,11 @@ class HasOneAutocompleteField extends FormField
         $sort = [];
 
         foreach ($searchFields as $searchField) {
-            $name = (strpos($searchField, ':') !== FALSE) ? $searchField : "$searchField:PartialMatch:nocase";
-            $params[$name] = $query;
-            $sort[$searchField] = "ASC";
+            if(!is_array($searchField)) {
+                $name = (strpos($searchField, ':') !== FALSE) ? $searchField : "$searchField:PartialMatch:nocase";
+                $params[$name] = $query;
+                $sort[$searchField] = "ASC";
+            }
         }
 
         $results = DataList::create($this->sourceObject)
