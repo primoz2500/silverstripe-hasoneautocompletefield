@@ -268,7 +268,7 @@ class HasOneAutocompleteField extends FormField
             if ($item->$labelField()) {
                 $text = $item->$labelField();
             } else {
-                user_error("PageSearchField can't find field called " . $labelField . "on " . $item->ClassName, E_USER_ERROR);
+                $text = "UNDEFINED";
             }
 
             if (method_exists($item, "Link")) {
