@@ -5,20 +5,23 @@
 
         // Clicking the edit button "opens" the search field
         $(".hasoneautocomplete-editbutton").entwine({
-            onclick: function () {
+            onclick: function (event) {
+                event.preventDefault();
                 this.closest('.hasoneautocomplete').find('.hasoneautocomplete-search').trigger('open');
             }
         });
 
         // Clicking the cancel button "closes" the search field
         $(".hasoneautocomplete-cancelbutton").entwine({
-            onclick: function () {
+            onclick: function (event) {
+                event.preventDefault();
                 this.closest('.hasoneautocomplete').find('.hasoneautocomplete-search').trigger('close');
             }
         });
 
         $(".hasoneautocomplete-clearbutton").entwine({
-            onclick: function () {
+            onclick: function (event) {
+                event.preventDefault();
                 var defaultText = String(this.closest('.hasoneautocomplete').data('default-text')).trim();
                 var $currentText = this.closest('.hasoneautocomplete').find('.hasoneautocomplete-currenttext').first();
                 var $idField = this.closest('.hasoneautocomplete').find('.hasoneautocomplete-id').first();
@@ -32,7 +35,7 @@
                 }
             },
             onmatch: function () {
-                $idField = this.closest('.hasoneautocomplete').find('.hasoneautocomplete-id').first();
+                var $idField = this.closest('.hasoneautocomplete').find('.hasoneautocomplete-id').first();
                 if ($idField.length) {
                     $idField.change(function (event) {
                         var $clearButton = $(this).closest('.hasoneautocomplete').find('.hasoneautocomplete-clearbutton').first();
@@ -69,11 +72,12 @@
                                 "X-Pjax": 'Partial'
                             },
                             type: "GET",
+                            dataType: 'json',
                             url: $(searchField).data('search-url'),
                             data: 'query=' + encodeURIComponent(searchTerm),
                             success: function (data) {
 
-                                var processedData = $.map(JSON.parse(data), function (item, id) {
+                                var processedData = $.map(data, function (item, id) {
                                     var output = {
                                         label: item.name, // what's shown in the dropdown
                                         value: '',  // what's shown in the text field
@@ -92,7 +96,7 @@
                             },
                             error: function (e) {
                                 console.log(e);
-                                alert('An error occured while fetching data from the server\n Please try again later.');
+                                alert('An error occurred while fetching data from the server\n Please try again later.');
                             }
                         });
                     },
@@ -121,7 +125,7 @@
 
                 this.autocomplete($.extend(autocompleteOptions, {
                     delay: autocompleteDelay
-                })).data('autocomplete')._renderItem = function (ul, item) {
+                })).data('ui-autocomplete')._renderItem = function (ul, item) {
                     var output = $("<li>")
                         .append($("<a>").html(item.label));
                     return output.appendTo(ul);

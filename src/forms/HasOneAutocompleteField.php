@@ -13,6 +13,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Core\Config\Config;
+use Exception;
 
 class HasOneAutocompleteField extends FormField
 {
@@ -177,10 +178,11 @@ class HasOneAutocompleteField extends FormField
     {
         $clone = parent::performReadonlyTransformation();
         $item = $this->getItem();
-        if($item) {
+        if ($item) {
             $labelField = $this->labelField;
-            if ($item->$labelField()) {
-                $clone->setValue($item->$labelField());
+            $value = $item->$labelField();
+            if ($value) {
+                $clone->setValue($value);
             }
         }
 
@@ -192,7 +194,7 @@ class HasOneAutocompleteField extends FormField
         if (is_array($fields)) {
             $this->searchFields = $fields;
         } else {
-            $this->searchFields = array($fields);
+            $this->searchFields = [$fields];
         }
         return $this;
     }
@@ -235,13 +237,10 @@ class HasOneAutocompleteField extends FormField
     protected function processResults($results)
     {
         $json = [];
-        $count = 0;
         foreach ($results as $result) {
-            $name = $result->{$this->labelField}();
-
-            $json[$count++] = [
+            $json[] = [
                 'id' => $result->ID,
-                'name' => $name,
+                'name' => $result->{$this->labelField}(),
                 'currentString' => $this->getCurrentItemText($result)
             ];
         }
@@ -255,7 +254,7 @@ class HasOneAutocompleteField extends FormField
      * @param DataObjext $item
      * @return string
      */
-    function getCurrentItemText($item = null)
+    public function getCurrentItemText($item = null)
     {
         $text = $this->getDefaultText();
 
@@ -294,7 +293,7 @@ class HasOneAutocompleteField extends FormField
      * Get the currently selected object
      * @return DataObject
      */
-    function getItem()
+    public function getItem()
     {
         $sourceObject = $this->sourceObject;
         if ($this->value !== null) {
@@ -370,7 +369,6 @@ class HasOneAutocompleteField extends FormField
         Requirements::css('primoz2500/hasoneautocompletefield: client/dist/css/hasoneautocompletefield.css');
 
         $fields = FieldGroup::create($this->name);
-        $fields->setName($this->name);
 
         $fields->push($labelField = LiteralField::create($this->name . 'Label', '<span class="hasoneautocomplete-currenttext">' . $this->getCurrentItemText() . '</span>'));
 
